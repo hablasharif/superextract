@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sitemap Scraper</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* Add your CSS styling here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+        }
+        .table th, .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .table th {
+            background-color: #333;
+            color: #fff;
+            border-right: 1px solid #ddd;
+        }
+        .table td.url {
+            border-right: 1px solid #ddd;
+        }
+        .table td.serial-no, .table td.copy {
+            user-select: none;
+        }
+        .url {
+            color: #007bff;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .url:hover {
+            color: #0056b3;
+        }
+        .copy-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .copy-button:hover {
+            background-color: #0056b3;
+        }
+        .copy-text {
+            user-select: none;
+        }
+
+        /* Responsive design */
+        @media screen and (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            .table th, .table td {
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Sitemap Scraper</h1>
+    <div class="container">
+        <form method="POST">
+            <label for="domain">Enter Domain:</label>
+            <input type="text" name="domain" id="domain" required>
+            <button type="submit">Submit</button>
+        </form>
+        {% if url_list %}
+        <h2>Total URLs: {{ total_urls }}</h2>
+        <button id="copy-all-button" onclick="copyAllToClipboard()">Copy All</button>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Serial No</th>
+                    <th class="url-header">URL</th>
+                    <th>Copy</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- This part is updated to make URLs selectable -->
+                {% for url in url_list %}
+                <tr>
+                    <td class="serial-no"></td>
+                    <td class="url"><a href="{{ url }}" target="_blank">{{ url }}</a></td>
+                    <td class="copy">
+                        <div class="copy-button" onclick="copyToClipboard(this)">Copy</div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+    
+    <script>
+        // JavaScript function to generate serial numbers
+        function generateSerialNumbers() {
+            const serialNumberCells = document.querySelectorAll("tbody td.serial-no");
+            serialNumberCells.forEach((cell, index) => {
+                cell.textContent = index + 1;
+            });
+        }
+
+        function copyToClipboard(button) {
+            const urlText = button.parentNode.parentNode.querySelector(".url a").getAttribute("href"); // Get the URL text
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = urlText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempTextArea);
+            button.style.backgroundColor = "#28a745"; // Change button color to green when copied
+        }
+
+        function copyAllToClipboard() {
+            const urlTexts = document.querySelectorAll(".url a");
+            const urls = Array.from(urlTexts).map(link => link.getAttribute("href").trim()); // Extract URL text
+
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = urls.join("\n");
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempTextArea);
+
+            const copyAllButton = document.getElementById("copy-all-button");
+            copyAllButton.style.backgroundColor = "#28a745"; // Change button color to green when copied
+        }
+
+        // Call the function to generate serial numbers when the page loads
+        generateSerialNumbers();
+    </script>
+</body>
+</html>
